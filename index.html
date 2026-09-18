@@ -1,0 +1,263 @@
+<title>Star-Coupled Habitat</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --space:#0B1020; --deep:#101733; --panel:#141C3A; --line:#26305A;
+  --bone:#ECE6D8; --muted:#97A0BC; --faint:#5E678A;
+  --copper:#E0A458; --copper-soft:rgba(224,164,88,.18);
+  --ice:#8FD3F4; --ice-soft:rgba(143,211,244,.16);
+  --coral:#FF6B57; --coral-soft:rgba(255,107,87,.16);
+  --moss:#8CCB8A;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--space);color:var(--bone);font-family:"IBM Plex Serif",Georgia,serif;font-size:17px;line-height:1.6}
+.wrap{max-width:980px;margin:0 auto;padding-inline:20px;padding-block:28px 96px}
+h1,h2,h3{font-family:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;text-wrap:balance;margin:0}
+h1{font-size:clamp(38px,7vw,72px);font-weight:800;line-height:.95;letter-spacing:-.02em}
+h1 span{color:var(--copper)}
+h2{font-size:clamp(22px,3.2vw,30px);font-weight:800;letter-spacing:-.01em;margin-bottom:10px}
+h3{font-size:17px;font-weight:800;margin-bottom:4px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper)}
+.lede{font-size:19px;max-width:62ch;color:var(--bone);margin:14px 0 0}
+.lede em{color:var(--ice);font-style:italic}
+p{max-width:65ch}
+.stage{margin:26px 0 0;border:1px solid var(--line);border-radius:6px;background:radial-gradient(ellipse at 50% 40%,#151E42 0%,#0B1020 70%);overflow:hidden;position:relative}
+canvas{display:block;width:100%;height:auto;max-width:100%}
+.hud{position:absolute;left:14px;top:12px;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);line-height:1.5}
+.hud b{color:var(--bone);font-weight:500}
+.hint{position:absolute;right:14px;bottom:10px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint)}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px;margin-top:16px;padding:18px;background:var(--deep);border:1px solid var(--line);border-radius:6px}
+.ctl{display:grid;gap:6px}
+.ctl label{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.ctl label output{color:var(--bone);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--copper);height:26px;margin:0}
+input[type=range]:focus-visible{outline:2px solid var(--ice);outline-offset:3px;border-radius:3px}
+.modes{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.modes .lbl{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+.modes button{font:inherit;font-family:"Bricolage Grotesque",sans-serif;font-weight:500;font-size:14.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--bone);cursor:pointer}
+.modes button[aria-pressed=true]{background:var(--copper);color:#1a1206;border-color:var(--copper)}
+.modes button.danger[aria-pressed=true]{background:var(--coral);border-color:var(--coral);color:#2a0e0a}
+.modes button:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
+.readouts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.ro{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.ro .k{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.ro .v{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:26px;line-height:1.1;margin-top:4px;font-variant-numeric:tabular-nums}
+.ro .u{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);margin-top:2px}
+.ro.good .v{color:var(--moss)} .ro.warn .v{color:var(--copper)} .ro.bad .v{color:var(--coral)}
+section{margin-top:56px}
+.q{border-left:3px solid var(--ice);padding:6px 0 6px 20px;margin:18px 0}
+.q p{font-size:20px;line-height:1.5;margin:0}
+.q .who{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);margin-top:8px;letter-spacing:.06em}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.arch{background:var(--deep);border:1px solid var(--line);border-radius:6px;padding:16px}
+.arch .tag{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:3px;display:inline-block;margin-bottom:10px}
+.tag.emp{background:rgba(140,203,138,.16);color:var(--moss)}
+.tag.exp{background:var(--copper-soft);color:var(--copper)}
+.tag.asp{background:var(--coral-soft);color:var(--coral)}
+.arch p{font-size:15px;margin:6px 0 0;color:var(--muted)}
+.arch p b{color:var(--bone);font-weight:500}
+.ledger{margin-top:14px;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:150px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);font-size:15.5px}
+.row .tag{align-self:start;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:3px;text-align:center}
+.row p{margin:0;color:var(--muted)} .row p b{color:var(--bone);font-weight:500}
+.foot{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:var(--faint);font-size:13.5px;font-family:"IBM Plex Mono",monospace;line-height:1.7}
+.foot a{color:var(--ice)}
+a:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
+@media (max-width:700px){
+  .controls{grid-template-columns:1fr}
+  .readouts{grid-template-columns:1fr 1fr}
+  .grid3{grid-template-columns:1fr}
+  .row{grid-template-columns:1fr;gap:6px}
+  .hud{font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){ .stage{--motion:0} }
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">A rotating habitat, and one question for a geometer</div>
+  <h1>Star-Coupled <span>Habitat</span></h1>
+  <p class="lede">Not a flat disk. A cage within a cage: rings in different planes, held in magnetic suspension, each drawing spin from one outer driver ring. Gravity by rotation is textbook. <em>The open problem is what the tilted rings do to each other.</em> Drag the model. Break it on purpose.</p>
+
+  <div class="stage" id="stage">
+    <canvas id="cv" width="1200" height="720" aria-label="Animated model of nested rotating rings"></canvas>
+    <div class="hud" id="hud"></div>
+    <div class="hint">drag to orbit · scroll to zoom</div>
+  </div>
+
+  <div class="controls">
+    <div class="ctl">
+      <label for="rpm">Spin rate <output id="rpmOut">2.0 rpm</output></label>
+      <input type="range" id="rpm" min="0.3" max="6" step="0.1" value="2">
+    </div>
+    <div class="ctl">
+      <label for="rad">Driver ring radius <output id="radOut">224 m</output></label>
+      <input type="range" id="rad" min="40" max="600" step="4" value="224">
+    </div>
+    <div class="modes">
+      <span class="lbl">Arrangement</span>
+      <button id="mCage" aria-pressed="true">Cage in cage</button>
+      <button id="mPlane" aria-pressed="false">Coplanar rings</button>
+      <span class="lbl" style="margin-left:14px">Physics</span>
+      <button id="mPrec" class="danger" aria-pressed="false">Let precession loose</button>
+      <button id="mGov" aria-pressed="true">Attentive governor</button>
+    </div>
+  </div>
+
+  <div class="readouts">
+    <div class="ro" id="roG"><div class="k">Rim gravity</div><div class="v" id="gV">1.00</div><div class="u">g at the driver ring</div></div>
+    <div class="ro" id="roV"><div class="k">Rim speed</div><div class="v" id="vV">47</div><div class="u">m/s, about 169 km/h</div></div>
+    <div class="ro" id="roC"><div class="k">Coriolis comfort</div><div class="v" id="cV">at the cap</div><div class="u">2 rpm is where inner ears stop noticing</div></div>
+    <div class="ro" id="roP"><div class="k">Precession</div><div class="v" id="pV">held</div><div class="u" id="pU">active magnetic bearings correcting</div></div>
+  </div>
+
+  <section>
+    <h2>The question</h2>
+    <div class="q">
+      <p>Rings spinning in different planes each carry an angular momentum vector pointing a different way. Couple them, or nudge one, and it answers by twisting perpendicular to the push. Can the field geometry be arranged so a set of non-coplanar levitated rings stays put, or does every arrangement pay for stability with continuous power?</p>
+      <div class="who">Kellie Peterson, Star-Coupled Rotational Habitat, v0.2 draft, July 2026</div>
+    </div>
+    <p>Two AI reviewers flagged it. A real geometer has not. That is the ask.</p>
+  </section>
+
+  <section>
+    <h2>Three ways to build it</h2>
+    <div class="grid3">
+      <div class="arch"><span class="tag emp">Empirical</span><h3>Single shell, one axis</h3><p>The Bernal sphere, 1929. <b>500 m at 1.9 rpm</b> gives one g at the equator and nothing at the poles, for free. Must be shaped wider than tall or the intermediate-axis theorem flips the floor into a wall.</p></div>
+      <div class="arch"><span class="tag exp">Experimental</span><h3>Star topology, one plane</h3><p>Every ring couples to <b>one outer driver</b>, not to its neighbor. The driver is flywheel, gravity source, and attitude control at once, which NASA already does in one device class. Not in the literature as a habitat.</p></div>
+      <div class="arch"><span class="tag asp">Aspirational</span><h3>Cage in cage, many planes</h3><p>Great-circle bands, no shared axis, coupled by field not by adjacency. <b>Downgraded on review</b>: each ring precesses, so the suspension must actively hold it. Power cost unknown. This is the model above.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What the numbers are doing</h2>
+    <p>Effective gravity at the rim is <span style="font-family:'IBM Plex Mono',monospace">g = ω²r</span>, with ω in radians per second. Comfort literature caps rotation near 2 rpm; above that the Coriolis twist becomes noticeable when you move toward or away from the axis. At 2 rpm, one full g wants a radius of about 224 m. Smaller rings still work, they just deliver partial gravity or ask for adaptation. The sliders hold to that scale.</p>
+    <div class="ledger">
+      <div class="row"><span class="tag emp">Empirical</span><p><b>Rotational artificial gravity, magnetic bearings, flywheel energy storage, momentum-exchange attitude control.</b> Flight-proven or studied by NASA and ESA for decades.</p></div>
+      <div class="row"><span class="tag exp">Experimental</span><p><b>Star-topology coupling, polarity-reversal momentum transfer, waste as ballast.</b> Sound in isolation, unmodeled at habitat scale.</p></div>
+      <div class="row"><span class="tag asp">Aspirational</span><p><b>Non-coplanar cage, rings as radiation shield.</b> Kept in the record as ideas. A Faraday cage stops fields, not cosmic rays.</p></div>
+    </div>
+  </section>
+
+  <div class="foot">
+    Model: orthographic projection, rings as great circles, spin markers on each ring. Precession mode applies a torque-free wobble to every tilted ring's axis so the failure is visible, not a simulation of magnetic coupling. Numbers follow the paper. The paper itself: <a href="https://docs.google.com/document/d/1Zws-eshmLE4CLkZMQgaP-sFL4pDMVwGT9C8vxSnNe-U/edit">Star-Coupled Rotational Habitat, v0.2 draft</a>.
+  </div>
+</div>
+
+<script>
+(function(){
+  const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const state={rpm:2,rad:224,cage:true,prec:false,gov:true,yaw:-0.55,pitch:0.42,zoom:1,t:0,wob:0};
+  // rings: driver at equator; inner bands at tilts. r = fraction of driver radius, tilt about x then z.
+  function rings(){
+    if(state.cage) return [
+      {r:1.00,tx:0,tz:0,col:'copper',w:7,spin:1.0,dir:1,name:'driver'},
+      {r:0.78,tx:1.05,tz:0.3,col:'ice',w:4.5,spin:0.85,dir:-1},
+      {r:0.66,tx:0.55,tz:2.1,col:'ice',w:4,spin:0.7,dir:1},
+      {r:0.52,tx:1.35,tz:1.2,col:'ice',w:3.5,spin:0.95,dir:-1},
+      {r:0.36,tx:0.2,tz:0.9,col:'ice',w:3,spin:0.6,dir:1}
+    ];
+    return [
+      {r:1.00,tx:0,tz:0,col:'copper',w:7,spin:1.0,dir:1,name:'driver'},
+      {r:0.80,tx:0,tz:0,col:'ice',w:4.5,spin:0.85,dir:-1},
+      {r:0.62,tx:0,tz:0,col:'ice',w:4,spin:0.7,dir:1},
+      {r:0.46,tx:0,tz:0,col:'ice',w:3.5,spin:0.95,dir:-1},
+      {r:0.30,tx:0,tz:0,col:'ice',w:3,spin:0.6,dir:1}
+    ];
+  }
+  const COL={copper:'#E0A458',ice:'#8FD3F4',coral:'#FF6B57'};
+  function rotX(p,a){const c=Math.cos(a),s=Math.sin(a);return [p[0],p[1]*c-p[2]*s,p[1]*s+p[2]*c]}
+  function rotY(p,a){const c=Math.cos(a),s=Math.sin(a);return [p[0]*c+p[2]*s,p[1],-p[0]*s+p[2]*c]}
+  function rotZ(p,a){const c=Math.cos(a),s=Math.sin(a);return [p[0]*c-p[1]*s,p[0]*s+p[1]*c,p[2]]}
+  function proj(p){ // world -> camera
+    let q=rotY(p,state.yaw); q=rotX(q,state.pitch);
+    const S=Math.min(W,H)*0.40*state.zoom;
+    return {x:W/2+q[0]*S, y:H/2-q[1]*S, z:q[2]};
+  }
+  function ringPoint(rg,ang,wob){
+    let p=[Math.cos(ang)*rg.r,0,Math.sin(ang)*rg.r];
+    // tilt the ring's plane
+    let tx=rg.tx, tz=rg.tz;
+    if(wob && rg.name!=='driver' && (rg.tx||rg.tz)){ tx+=Math.sin(state.wob*1.7+rg.tz)*wob*0.9; tz+=Math.cos(state.wob*1.3+rg.tx)*wob*0.9; }
+    p=rotX(p,tx); p=rotZ(p,tz);
+    return p;
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // faint stars
+    ctx.save(); ctx.globalAlpha=.5;
+    for(let i=0;i<70;i++){ const x=(i*733)%W, y=(i*271)%H; ctx.fillStyle='#3a4670'; ctx.fillRect(x,y,1.2,1.2); }
+    ctx.restore();
+    const list=rings();
+    const wob=state.prec?Math.min(1,state.wobAmt||0):0;
+    // core
+    const c=proj([0,0,0]);
+    ctx.beginPath(); ctx.arc(c.x,c.y,10*state.zoom,0,Math.PI*2); ctx.fillStyle='#ECE6D8'; ctx.fill();
+    // axis of driver
+    const a1=proj([0,1.25,0]),a2=proj([0,-1.25,0]);
+    ctx.strokeStyle='rgba(224,164,88,.35)'; ctx.setLineDash([4,6]); ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(a1.x,a1.y); ctx.lineTo(a2.x,a2.y); ctx.stroke(); ctx.setLineDash([]);
+    // segments, depth sorted
+    const segs=[]; const N=96;
+    list.forEach((rg,ri)=>{
+      const pts=[]; for(let i=0;i<=N;i++){ pts.push(proj(ringPoint(rg,i/N*Math.PI*2,wob))); }
+      for(let i=0;i<N;i++){ segs.push({a:pts[i],b:pts[i+1],z:(pts[i].z+pts[i+1].z)/2,rg}); }
+      // spin markers
+      const k=3; for(let m=0;m<k;m++){ const ang=state.t*rg.spin*rg.dir*state.rpm*0.35+m*Math.PI*2/k; const q=proj(ringPoint(rg,ang,wob)); segs.push({dot:q,z:q.z,rg}); }
+    });
+    segs.sort((p,q)=>p.z-q.z);
+    segs.forEach(s=>{
+      const near=(s.z+1)/2; // 0 far .. 1 near
+      const stressed=state.prec && !state.gov && s.rg.name!=='driver' && s.rg.tx;
+      const col=stressed?COL.coral:COL[s.rg.col];
+      if(s.dot){ ctx.beginPath(); ctx.arc(s.dot.x,s.dot.y,(s.rg.w*0.9+2)*state.zoom,0,Math.PI*2); ctx.fillStyle=col; ctx.globalAlpha=.55+.45*near; ctx.fill(); ctx.globalAlpha=1; return; }
+      ctx.beginPath(); ctx.moveTo(s.a.x,s.a.y); ctx.lineTo(s.b.x,s.b.y);
+      ctx.lineWidth=s.rg.w*state.zoom*(0.6+0.6*near); ctx.strokeStyle=col; ctx.globalAlpha=.35+.65*near; ctx.lineCap='round'; ctx.stroke(); ctx.globalAlpha=1;
+    });
+  }
+  let last=performance.now();
+  function tick(now){
+    const dt=Math.min(.05,(now-last)/1000); last=now;
+    if(!reduced){ state.t+=dt; }
+    if(state.prec){ state.wob+=dt*(state.gov?0.6:1.4); state.wobAmt=Math.min(1,(state.wobAmt||0)+dt*(state.gov?0.15:0.5)); if(state.gov) state.wobAmt=Math.min(state.wobAmt,0.18); }
+    else { state.wobAmt=Math.max(0,(state.wobAmt||0)-dt*0.8); state.wob+=dt*0.6; }
+    draw(); requestAnimationFrame(tick);
+  }
+  // interaction
+  let drag=null;
+  cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,yaw:state.yaw,pitch:state.pitch}; cv.setPointerCapture(e.pointerId)});
+  cv.addEventListener('pointermove',e=>{ if(!drag) return; state.yaw=drag.yaw+(e.clientX-drag.x)*0.008; state.pitch=Math.max(-1.4,Math.min(1.4,drag.pitch+(e.clientY-drag.y)*0.008)); });
+  cv.addEventListener('pointerup',()=>drag=null); cv.addEventListener('pointercancel',()=>drag=null);
+  cv.addEventListener('wheel',e=>{ e.preventDefault(); state.zoom=Math.max(.5,Math.min(2.2,state.zoom*(e.deltaY>0?0.93:1.07))); },{passive:false});
+  // controls
+  const $=s=>document.querySelector(s);
+  function press(id,on){ const b=$(id); b.setAttribute('aria-pressed',on?'true':'false'); }
+  $('#mCage').onclick=()=>{state.cage=true;press('#mCage',1);press('#mPlane',0);readout()};
+  $('#mPlane').onclick=()=>{state.cage=false;press('#mCage',0);press('#mPlane',1);readout()};
+  $('#mPrec').onclick=()=>{state.prec=!state.prec;press('#mPrec',state.prec);readout()};
+  $('#mGov').onclick=()=>{state.gov=!state.gov;press('#mGov',state.gov);readout()};
+  $('#rpm').oninput=e=>{state.rpm=+e.target.value;readout()};
+  $('#rad').oninput=e=>{state.rad=+e.target.value;readout()};
+  function readout(){
+    const w=state.rpm*2*Math.PI/60, g=w*w*state.rad/9.81, v=w*state.rad;
+    $('#rpmOut').textContent=state.rpm.toFixed(1)+' rpm';
+    $('#radOut').textContent=state.rad+' m';
+    $('#gV').textContent=g.toFixed(2);
+    $('#vV').textContent=Math.round(v);
+    $('#roV').querySelector('.u').textContent='m/s, about '+Math.round(v*3.6)+' km/h';
+    const roG=$('#roG'); roG.className='ro '+(g>=0.9&&g<=1.1?'good':g>1.5?'bad':'warn');
+    const roC=$('#roC'), cV=$('#cV');
+    if(state.rpm<=2){cV.textContent=state.rpm<2?'comfortable':'at the cap';roC.className='ro good'}
+    else if(state.rpm<=4){cV.textContent='needs adaptation';roC.className='ro warn'}
+    else {cV.textContent='inner ear objects';roC.className='ro bad'}
+    const roP=$('#roP'), pV=$('#pV'), pU=$('#pU');
+    if(!state.cage){pV.textContent='none';pU.textContent='shared axis, shared plane';roP.className='ro good'}
+    else if(!state.prec){pV.textContent='held';pU.textContent='active magnetic bearings correcting';roP.className='ro good'}
+    else if(state.gov){pV.textContent='wobbling';pU.textContent='governor damping at unknown power cost';roP.className='ro warn'}
+    else {pV.textContent='tumbling';pU.textContent='rings drift toward each other';roP.className='ro bad'}
+    $('#hud').innerHTML='ω = <b>'+w.toFixed(3)+'</b> rad/s &nbsp; r = <b>'+state.rad+'</b> m<br>g = ω²r = <b>'+(w*w*state.rad).toFixed(2)+'</b> m/s² &nbsp; (<b>'+g.toFixed(2)+'</b> g)';
+  }
+  readout(); requestAnimationFrame(tick);
+})();
+</script>
